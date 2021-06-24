@@ -1,1 +1,102 @@
+use luminance::backend::color_slot::ColorSlot;
+use luminance::backend::depth_slot::DepthSlot;
+use luminance::framebuffer::Framebuffer;
+use luminance::pixel::NormRGB8UI;
+use luminance::tess::Mode;
+use luminance::texture::{Dimensionable, GenMipmaps, Sampler};
+use luminance::UniformInterface;
+use luminance::{
+    blending::{Blending, Equation, Factor},
+    context::GraphicsContext,
+    pipeline::{PipelineState, TextureBinding},
+    pixel::NormUnsigned,
+    render_state::RenderState,
+    shader::Uniform,
+    texture::Dim2,
+};
+use luminance_front::*;
+
+const VS: &str = include_str!("shaders/texture-vs.glsl");
+const FS: &str = include_str!("shaders/texture-fs.glsl");
+
+#[derive(UniformInterface)]
+struct ShaderInterface {
+    tex: Uniform<TextureBinding<Dim2, NormUnsigned>>,
+}
+
 pub struct RenderTexture {}
+
+impl RenderTexture {
+    pub fn render<C, B, D, CS, DS>(
+        surface: &mut C,
+        back_buffer: &Framebuffer<Backend, D, CS, DS>,
+        texels: &[u8],
+    ) -> Result<luminance::pipeline::Render<luminance::pipeline::PipelineError>, String>
+    where
+        C: GraphicsContext<Backend = Backend>,
+        D: Dimensionable,
+        CS: ColorSlot<Backend, D>,
+        DS: DepthSlot<Backend, D>,
+    {
+        let render_st = RenderState::default().set_blending_separate(
+            Blending {
+                equation: Equation::Additive,
+                src: Factor::SrcAlpha,
+                dst: Factor::SrcAlphaComplement,
+            },
+            Blending {
+                equation: Equation::Additive,
+                src: Factor::One,
+                dst: Factor::Zero,
+            },
+        );
+
+        let building_program = surface
+            .new_shader_program::<(), (), ShaderInterface>()
+            .from_strings(VS, None, None, FS);
+
+        let built_program = match building_program {
+            Ok(p) => p,
+            Err(_e) => {
+                // log!("{:?}", _e);
+                panic!("Can't build program");
+            }
+        };
+
+        let mut program = built_program.ignore_warnings();
+
+        let mut tex = surface
+            .new_texture::<Dim2, NormRGB8UI>([800, 800], 0, Sampler::default())
+            // .map_err(|e| log!("error while creating texture: {}", e))
+            .expect("texture creation");
+
+        tex.upload_raw(GenMipmaps::No, &texels)
+            .expect("texture upload");
+
+        let tess = surface
+            .new_tess()
+            .set_vertex_nb(4)
+            .set_mode(Mode::TriangleFan)
+            .build()
+            .unwrap();
+
+        let render = surface
+            .new_pipeline_gate()
+            .pipeline(
+                &back_buffer,
+                &PipelineState::default().set_clear_color([0.9, 0.9, 0.9, 1.]),
+                |pipeline, mut shd_gate| {
+                    let bound_tex = pipeline.bind_texture(&mut tex)?;
+
+                    shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
+                        iface.set(&uni.tex, bound_tex.binding());
+
+                        rdr_gate.render(&render_st, |mut tess_gate| tess_gate.render(&tess))
+                    })
+                },
+            )
+            .assume();
+
+        Ok(render)
+    }
+}
