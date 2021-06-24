@@ -1,7 +1,7 @@
 use luminance::backend::color_slot::ColorSlot;
 use luminance::backend::depth_slot::DepthSlot;
 use luminance::framebuffer::Framebuffer;
-use luminance::pixel::NormRGB8UI;
+use luminance::pixel::Pixel;
 use luminance::tess::Mode;
 use luminance::texture::{Dimensionable, GenMipmaps, Sampler};
 use luminance::UniformInterface;
@@ -27,16 +27,18 @@ struct ShaderInterface {
 pub struct RenderTexture {}
 
 impl RenderTexture {
-    pub fn render<C, B, D, CS, DS>(
+    pub fn render<C, B, D, CS, DS, P>(
         surface: &mut C,
         back_buffer: &Framebuffer<Backend, D, CS, DS>,
         texels: &[u8],
+        size: [u32; 2],
     ) -> Result<luminance::pipeline::Render<luminance::pipeline::PipelineError>, String>
     where
         C: GraphicsContext<Backend = Backend>,
         D: Dimensionable,
         CS: ColorSlot<Backend, D>,
         DS: DepthSlot<Backend, D>,
+        P: Pixel<RawEncoding = u8, SamplerType = NormUnsigned>,
     {
         let render_st = RenderState::default().set_blending_separate(
             Blending {
@@ -66,11 +68,11 @@ impl RenderTexture {
         let mut program = built_program.ignore_warnings();
 
         let mut tex = surface
-            .new_texture::<Dim2, NormRGB8UI>([800, 800], 0, Sampler::default())
+            .new_texture::<Dim2, P>(size, 0, Sampler::default())
             // .map_err(|e| log!("error while creating texture: {}", e))
             .expect("texture creation");
 
-        tex.upload_raw(GenMipmaps::No, &texels)
+        tex.upload_raw(GenMipmaps::No, texels)
             .expect("texture upload");
 
         let tess = surface
