@@ -2,7 +2,7 @@
 use std::{thread, time};
 
 use glfw::Context as _;
-use luminance::pixel::NormRGB8UI;
+use luminance::pixel::{NormRGB8UI, SRGBA8UI};
 use luminance::texture::Dim2;
 use luminance_front::Backend;
 use luminance_glfw::GlfwSurface;
@@ -39,7 +39,7 @@ fn main() {
 
     let back_buffer = surface.context.back_buffer().unwrap();
 
-    match RenderTexture::render::<_, Backend, Dim2, (), (), NormRGB8UI>(
+    match RenderTexture::render::<_, Backend, Dim2, (), (), SRGBA8UI>(
         &mut surface.context,
         &back_buffer,
         &texels,
