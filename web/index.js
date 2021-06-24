@@ -1,4 +1,4 @@
 
 import './pkg';
 
-console.log("Hello");
+console.log("#[wasm_bindgen(start)] completed");

@@ -1,9 +1,10 @@
 use luminance::backend::color_slot::ColorSlot;
 use luminance::backend::depth_slot::DepthSlot;
 use luminance::framebuffer::Framebuffer;
-use luminance::pixel::Pixel;
+#[allow(unused_imports)]
+use luminance::pixel::{NormRGB8UI, SRGBA8UI};
 use luminance::tess::Mode;
-use luminance::texture::{Dimensionable, GenMipmaps, Sampler};
+use luminance::texture::{Dimensionable, GenMipmaps, MinFilter, Sampler};
 use luminance::UniformInterface;
 use luminance::{
     blending::{Blending, Equation, Factor},
@@ -38,12 +39,11 @@ impl RenderTexture {
         D: Dimensionable,
         CS: ColorSlot<Backend, D>,
         DS: DepthSlot<Backend, D>,
-        P: Pixel<RawEncoding = u8, SamplerType = NormUnsigned>,
     {
         let render_st = RenderState::default().set_blending_separate(
             Blending {
                 equation: Equation::Additive,
-                src: Factor::SrcAlpha,
+                src: Factor::One,
                 dst: Factor::SrcAlphaComplement,
             },
             Blending {
@@ -67,8 +67,17 @@ impl RenderTexture {
 
         let mut program = built_program.ignore_warnings();
 
+        // Can't easily parameterize the Pixel type
+        // due to https://github.com/phaazon/luminance-rs/issues/477
         let mut tex = surface
-            .new_texture::<Dim2, P>(size, 0, Sampler::default())
+            .new_texture::<Dim2, SRGBA8UI>(
+                size,
+                0,
+                Sampler {
+                    min_filter: MinFilter::Linear,
+                    ..Sampler::default()
+                },
+            )
             // .map_err(|e| log!("error while creating texture: {}", e))
             .expect("texture creation");
 
@@ -86,7 +95,7 @@ impl RenderTexture {
             .new_pipeline_gate()
             .pipeline(
                 &back_buffer,
-                &PipelineState::default().set_clear_color([0.9, 0.9, 0.9, 1.]),
+                &PipelineState::default().set_clear_color([0.6, 0.6, 0.6, 1.]),
                 |pipeline, mut shd_gate| {
                     let bound_tex = pipeline.bind_texture(&mut tex)?;
 

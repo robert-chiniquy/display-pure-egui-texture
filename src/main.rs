@@ -1,18 +1,26 @@
+// #![cfg(not(target_arch = "wasm32"))]
+#![allow(unused_imports)]
 // use std::path::PathBuf;
 use std::{thread, time};
 
+#[cfg(not(target_arch = "wasm32"))]
 use glfw::Context as _;
+#[allow(unused_imports)]
 use luminance::pixel::{NormRGB8UI, SRGBA8UI};
 use luminance::texture::Dim2;
+#[cfg(not(target_arch = "wasm32"))]
 use luminance_front::Backend;
+#[cfg(not(target_arch = "wasm32"))]
 use luminance_glfw::GlfwSurface;
 use luminance_windowing::{WindowDim, WindowOpt};
 
 use trypure::texture::RenderTexture;
 use trypure::ui;
 
+#[cfg(not(target_arch = "wasm32"))]
 fn main() {
     /*
+    //NormRGB8UI
     let path = PathBuf::from("./source.jpg");
     let texture = image::open(&path)
         .map(|img| img.flipv().to_rgb8())
@@ -27,6 +35,7 @@ fn main() {
     }
     */
 
+    // SRGBA8UI
     let (texels, size) = ui::load_egui_texels();
 
     let dim = WindowDim::Windowed {
@@ -34,8 +43,8 @@ fn main() {
         height: size[1],
     };
 
-    let mut surface =
-        GlfwSurface::new_gl33("try", WindowOpt::default().set_dim(dim)).expect("GLFW surface");
+    let mut surface = GlfwSurface::new_gl33("Egui texture", WindowOpt::default().set_dim(dim))
+        .expect("GLFW surface");
 
     let back_buffer = surface.context.back_buffer().unwrap();
 
@@ -55,6 +64,9 @@ fn main() {
         Err(e) => println!("{:?}", e),
     }
 
-    let twenty_seconds = time::Duration::from_secs(20);
-    thread::sleep(twenty_seconds);
+    let one_minute = time::Duration::from_secs(60);
+    thread::sleep(one_minute);
 }
+
+#[cfg(target_arch = "wasm32")]
+pub fn main() {}

@@ -694,8 +694,10 @@ dependencies = [
  "luminance-gl",
  "luminance-glfw",
  "luminance-web-sys",
+ "luminance-webgl",
  "luminance-windowing",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
