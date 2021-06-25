@@ -28,7 +28,5 @@ pub fn load_egui_texels() -> (Vec<u8>, [u32; 2]) {
         texels.push(srgba.a());
     }
 
-    texels.reverse();
-
     (texels, egui_texture_size)
 }
