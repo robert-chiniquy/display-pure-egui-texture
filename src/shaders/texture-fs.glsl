@@ -17,7 +17,6 @@ vec4 srgba_from_linear(vec4 rgba) {
 }
 
 void main() {
-  // this rotates the texture so the letters face up, still haven't figured out why they are rotated
   vec2 rot_uv = vec2(v_uv.x, 1.0 - v_uv.y);
   frag = texture(tex, rot_uv);
 
