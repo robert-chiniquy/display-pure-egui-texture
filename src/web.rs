@@ -5,12 +5,6 @@ use crate::ui;
 use wasm_bindgen::prelude::*;
 
 #[cfg(target_arch = "wasm32")]
-use luminance_web_sys::WebSysWebGL2Surface;
-
-#[cfg(target_arch = "wasm32")]
-use crate::texture::RenderTexture;
-
-#[cfg(target_arch = "wasm32")]
 const CANVAS: &str = "canvas";
 
 #[allow(unused_macros)]
@@ -24,8 +18,16 @@ macro_rules! log {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(start)]
 pub fn start() {
+    render();
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn render() {
+    use crate::texture::RenderTexture;
     use luminance::{pixel::SRGBA8UI, texture::Dim2};
     use luminance_front::Backend;
+    use luminance_web_sys::WebSysWebGL2Surface;
 
     // SRGBA8UI
     let (texels, size) = ui::load_egui_texels();
