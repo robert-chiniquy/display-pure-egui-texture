@@ -68,6 +68,7 @@ impl RenderTexture {
             Ok(p) => p,
             Err(_e) => {
                 // log!("{:?}", _e);
+                // println!("{:?}", _e);
                 panic!("Can't build program");
             }
         };
