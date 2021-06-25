@@ -40,20 +40,25 @@ impl RenderTexture {
         CS: ColorSlot<Backend, D>,
         DS: DepthSlot<Backend, D>,
     {
+        // backface culling is off by default
         let render_st = RenderState::default()
             .set_blending_separate(
                 Blending {
                     equation: Equation::Additive,
-                    src: Factor::SrcAlpha,
+                    src: Factor::One,
                     dst: Factor::SrcAlphaComplement,
                 },
                 Blending {
                     equation: Equation::Additive,
-                    src: Factor::SrcAlpha,
+                    src: Factor::One,
                     dst: Factor::SrcAlphaComplement,
                 },
             )
             .set_depth_test(None);
+
+        let pipeline_st = PipelineState::default()
+            .enable_srgb(true)
+            .set_clear_color([0.6, 0.6, 0.6, 1.]);
 
         let building_program = surface
             .new_shader_program::<(), (), ShaderInterface>()
@@ -95,19 +100,15 @@ impl RenderTexture {
 
         let render = surface
             .new_pipeline_gate()
-            .pipeline(
-                &back_buffer,
-                &PipelineState::default().set_clear_color([0.6, 0.6, 0.6, 1.]),
-                |pipeline, mut shd_gate| {
-                    let bound_tex = pipeline.bind_texture(&mut tex)?;
+            .pipeline(&back_buffer, &pipeline_st, |pipeline, mut shd_gate| {
+                let bound_tex = pipeline.bind_texture(&mut tex)?;
 
-                    shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
-                        iface.set(&uni.tex, bound_tex.binding());
+                shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
+                    iface.set(&uni.tex, bound_tex.binding());
 
-                        rdr_gate.render(&render_st, |mut tess_gate| tess_gate.render(&tess))
-                    })
-                },
-            )
+                    rdr_gate.render(&render_st, |mut tess_gate| tess_gate.render(&tess))
+                })
+            })
             .assume();
 
         Ok(render)

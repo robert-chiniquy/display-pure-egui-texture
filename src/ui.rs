@@ -2,7 +2,10 @@
 use egui::{CtxRef, RawInput};
 
 pub fn load_egui_texels() -> (Vec<u8>, [u32; 2]) {
-    let i = RawInput::default();
+    let i = RawInput {
+        pixels_per_point: Some(2.0),
+        ..RawInput::default()
+    };
 
     let mut egui_ctx = CtxRef::default();
 
@@ -14,8 +17,6 @@ pub fn load_egui_texels() -> (Vec<u8>, [u32; 2]) {
         egui_ctx.texture().height as u32,
     ];
 
-    // log!("texture size: {:?}", egui_texture_size);
-
     let (_, _) = egui_ctx.end_frame();
 
     let mut texels: Vec<u8> = vec![];
@@ -26,6 +27,8 @@ pub fn load_egui_texels() -> (Vec<u8>, [u32; 2]) {
         texels.push(srgba.b());
         texels.push(srgba.a());
     }
+
+    texels.reverse();
 
     (texels, egui_texture_size)
 }
