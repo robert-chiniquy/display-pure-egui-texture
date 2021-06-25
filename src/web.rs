@@ -45,7 +45,7 @@ pub fn render() {
 
     let back_buffer = surface.back_buffer().unwrap();
 
-    match RenderTexture::render::<_, Backend, Dim2, (), (), SRGBA8UI>(
+    match RenderTexture::render::<_, Backend, Dim2, (), ()>(
         &mut surface,
         &back_buffer,
         &texels,

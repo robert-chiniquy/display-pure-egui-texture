@@ -19,6 +19,10 @@ use trypure::ui;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    // Depending on the texture you need to flip the pixel type for texture creation in texture.rs
+    // Can't easily parameterize the Pixel type
+    // due to https://github.com/phaazon/luminance-rs/issues/477
+
     /*
     //NormRGB8UI
     let path = PathBuf::from("./source.jpg");
@@ -35,6 +39,9 @@ fn main() {
     }
     */
 
+    // NormRGB8UI
+    // let (texels, size) = ui::load_egui_texels_rgb_only();
+
     // SRGBA8UI
     let (texels, size) = ui::load_egui_texels();
 
@@ -48,7 +55,7 @@ fn main() {
 
     let back_buffer = surface.context.back_buffer().unwrap();
 
-    match RenderTexture::render::<_, Backend, Dim2, (), (), SRGBA8UI>(
+    match RenderTexture::render::<_, Backend, Dim2, (), ()>(
         &mut surface.context,
         &back_buffer,
         &texels,

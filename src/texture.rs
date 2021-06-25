@@ -28,7 +28,7 @@ struct ShaderInterface {
 pub struct RenderTexture {}
 
 impl RenderTexture {
-    pub fn render<C, B, D, CS, DS, P>(
+    pub fn render<C, B, D, CS, DS>(
         surface: &mut C,
         back_buffer: &Framebuffer<Backend, D, CS, DS>,
         texels: &[u8],
@@ -42,18 +42,11 @@ impl RenderTexture {
     {
         // backface culling is off by default
         let render_st = RenderState::default()
-            .set_blending_separate(
-                Blending {
-                    equation: Equation::Additive,
-                    src: Factor::One,
-                    dst: Factor::SrcAlphaComplement,
-                },
-                Blending {
-                    equation: Equation::Additive,
-                    src: Factor::One,
-                    dst: Factor::SrcAlphaComplement,
-                },
-            )
+            .set_blending(Blending {
+                equation: Equation::Additive,
+                src: Factor::One,
+                dst: Factor::SrcAlphaComplement,
+            })
             .set_depth_test(None);
 
         let pipeline_st = PipelineState::default()
@@ -86,7 +79,6 @@ impl RenderTexture {
                     ..Sampler::default()
                 },
             )
-            // .map_err(|e| log!("error while creating texture: {}", e))
             .expect("texture creation");
 
         tex.upload_raw(GenMipmaps::No, texels)

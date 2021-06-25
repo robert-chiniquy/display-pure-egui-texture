@@ -16,6 +16,7 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin(['web/index.html']),
         new WasmPackPlugin({
+            forceMode: "production",
             crateDirectory: __dirname,
             outDir: path.resolve(__dirname,"./web/pkg")
         }),
