@@ -2,6 +2,8 @@
 
 This repo renders Egui's texture the exact same way, same shaders, same rendering flow, on both the GL and WebGL2 backends of Luminance.
 
+The rendering for both occurs in `texture.rs`.
+
 ## Run app on web
 
 ```
@@ -32,7 +34,7 @@ Notes:
 
 ![image of texture on native](./native.png "Egui Texture on native")
 
-This window has the dimensions of the texture, 2048x64. The clear color may be affecting it, but you can clearly see the characters Egui generates.
+This window has the dimensions of the texture, 2048x64.
 
 ## Rendered on web
 

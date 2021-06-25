@@ -40,18 +40,20 @@ impl RenderTexture {
         CS: ColorSlot<Backend, D>,
         DS: DepthSlot<Backend, D>,
     {
-        let render_st = RenderState::default().set_blending_separate(
-            Blending {
-                equation: Equation::Additive,
-                src: Factor::One,
-                dst: Factor::SrcAlphaComplement,
-            },
-            Blending {
-                equation: Equation::Additive,
-                src: Factor::One,
-                dst: Factor::Zero,
-            },
-        );
+        let render_st = RenderState::default()
+            .set_blending_separate(
+                Blending {
+                    equation: Equation::Additive,
+                    src: Factor::SrcAlpha,
+                    dst: Factor::SrcAlphaComplement,
+                },
+                Blending {
+                    equation: Equation::Additive,
+                    src: Factor::SrcAlpha,
+                    dst: Factor::SrcAlphaComplement,
+                },
+            )
+            .set_depth_test(None);
 
         let building_program = surface
             .new_shader_program::<(), (), ShaderInterface>()
