@@ -34,9 +34,13 @@ Notes:
 
 This window has the dimensions of the texture, 2048x64. The clear color may be affecting it, but you can clearly see the characters Egui generates.
 
+## Rendered on web
+
 ![image of texture on web](./web.png "Egui Texture on web")
 
-This is a 2048x64 canvas against a dark blue background. The gray clear color set on the graphics pipeline is not displayed, the background gray color is from the CSS style on the canvas. There's a real difference in how this texture is being rendered by these shaders under WebGL, maybe the difference is due to sampler interpolation? A difference in how WebGL2 handles pre-multiplied alpha?
+This is a 2048x64 canvas against a dark blue background. The gray clear color set on the graphics pipeline is not displayed, so the background gray color is from the CSS style on the canvas (when the background of the canvas is white, then every pixel appears white).
+
+There's a real difference in how this texture is being rendered by these shaders under WebGL, maybe the difference is due to sampler interpolation? A difference in how WebGL2 handles pre-multiplied alpha?
 
 
 
