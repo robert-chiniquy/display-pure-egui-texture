@@ -51,7 +51,7 @@ impl RenderTexture {
 
         let pipeline_st = PipelineState::default()
             .enable_srgb(true)
-            .set_clear_color([0.6, 0.6, 0.6, 1.]);
+            .set_clear_color([0.5, 0.5, 0.5, 1.]);
 
         let building_program = surface
             .new_shader_program::<(), (), ShaderInterface>()

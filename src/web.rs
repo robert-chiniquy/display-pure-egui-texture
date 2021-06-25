@@ -25,6 +25,7 @@ pub fn start() {
 #[wasm_bindgen]
 pub fn render() {
     use crate::texture::RenderTexture;
+    #[allow(unused_imports)]
     use luminance::{pixel::SRGBA8UI, texture::Dim2};
     use luminance_front::Backend;
     use luminance_web_sys::WebSysWebGL2Surface;
@@ -32,7 +33,6 @@ pub fn render() {
     // SRGBA8UI
     let (texels, size) = ui::load_egui_texels();
 
-    //
     /*
     let mut texels: Vec<u8> = vec![];
     for i in 0..(800 * 800 * 3) as i32 {
